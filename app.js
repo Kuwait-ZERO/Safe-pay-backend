@@ -7,7 +7,7 @@ const { NotFoundError } = require("./errors");
 
 const { authRouter } = require("./api/auth");
 const { cardsRouter } = require("./routes");
-
+const { cardPaymentRouter } = require("./routes/payment.router");
 const app = express();
 
 /**
@@ -22,7 +22,7 @@ app.use(currentUser);
  * Routers
  */
 app.use("/auth", authRouter);
-app.use("/cards", cardsRouter);
+app.use("/cards", cardsRouter, cardPaymentRouter);
 
 /**
  * Not Found Catchall

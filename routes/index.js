@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.use(cardsGetRouter);
 router.use(cardCreateRouter);
-// router.use(postDeleteRouter);
+router.use(pa);
 // router.use(postUpdateRouter);
 
 module.exports = { cardsRouter: router };
