@@ -29,6 +29,8 @@ function generateCardNumber() {
 router.post("/", requireAuth, validators, validateRequest, async (req, res) => {
   try {
     req.body.cardNumber = generateCardNumber();
+    // console.log(req.user.id);
+    req.body.user = req.user.id;
     const newCard = await Card.create(req.body);
     res.status(201).json(newCard);
   } catch (error) {
