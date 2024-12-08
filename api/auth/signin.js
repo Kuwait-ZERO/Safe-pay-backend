@@ -34,9 +34,9 @@ router.post("/signin", validators, validateRequest, async (req, res, next) => {
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRATION_MS }
   );
-
+  const balance = user.balance;
   // Respond with the token
-  res.status(200).json({ token });
+  res.status(200).json({ token, balance });
 });
 
 module.exports = { signinRouter: router };
