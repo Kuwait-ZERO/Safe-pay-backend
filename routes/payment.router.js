@@ -7,7 +7,7 @@ const { requireAuth } = require("../middleware");
 const router = express.Router();
 
 // POST route to make a payment using the card
-router.post("/pay", requireAuth, async (req, res) => {
+router.post("/pay", async (req, res) => {
   try {
     const { cardNumber, amount, paramName } = req.body;
 
