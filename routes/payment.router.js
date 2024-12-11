@@ -1,66 +1,76 @@
 const express = require("express");
 const Card = require("../model/card");
 const User = require("../model/user");
-const { requireAuth, validateRequest } = require("../middleware");
+const Transaction = require("../model/transaction");
+const { requireAuth } = require("../middleware");
 
 const router = express.Router();
 
 // POST route to make a payment using the card
 router.post("/pay", async (req, res) => {
   try {
-    const { cardNumber, amount } = req.body;
+    const { cardNumber, amount, paramName } = req.body;
 
-    // Validate input
+    // 1. Validate input
     if (!cardNumber || !amount || amount <= 0) {
       return res.status(400).json({ error: "Invalid cardNumber or amount." });
     }
 
-    // Find the card using the cardNumber
+    // 2. Find the card
     const card = await Card.findOne({ cardNumber }).populate("user");
     if (!card) {
       return res.status(404).json({ error: "Card not found." });
     }
 
-    // Verify that the user owns this card
     const user = card.user;
-    if (!user) {
+
+    // 3. Check if the card is expired
+    if (card.isExpired) {
       return res
-        .status(404)
-        .json({ error: "User associated with this card not found." });
+        .status(400)
+        .json({ error: "This card is expired and cannot be used." });
     }
 
-    // Check if the amount exceeds the card's limit
+    // 4. Check if amount exceeds card limit
     if (amount > card.limit) {
       return res
         .status(400)
         .json({ error: "Transaction amount exceeds card limit." });
     }
 
-    // Check if the user's balance is sufficient
+    // 5. Check if user has sufficient balance
     if (user.balance < amount) {
       return res.status(400).json({ error: "Insufficient user balance." });
     }
-    if (card.isExpired !== false) {
-      return res.status(400).json({ error: "Card is expired." });
-    }
 
-    // Deduct the amount from the user's balance
+    // 6. Deduct the amount from the user's balance
     user.balance -= amount;
     card.isExpired = true;
-    await user.save();
     await card.save();
-    return res.status(200).json({
+
+    // 7. Create a new Transaction
+    const newTransaction = await Transaction.create({
+      name: `${paramName} Transaction is a Payment using card ${card.cardNumber}`,
+      amount,
+    });
+
+    // 8. Add the transaction to the user's transaction array
+    user.transaction.push(newTransaction._id);
+    await user.save();
+
+    res.status(200).json({
       message: "Payment successful!",
       transaction: {
-        cardNumber: card.cardNumber,
-        amount,
+        id: newTransaction._id,
+        name: newTransaction.name,
+        amount: newTransaction.amount,
         remainingBalance: user.balance,
-        isExisExpired: true,
+        isExpired: card.isExpired,
       },
     });
   } catch (error) {
     console.error("Error processing payment:", error.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
