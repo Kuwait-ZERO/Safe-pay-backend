@@ -7,6 +7,7 @@ const User = require("../../model/user");
 const PasswordManager = require("../../helpers/passwordManager");
 const validateRequest = require("../../middleware/validateRequest");
 const { BadRequestError } = require("../../errors");
+const transaction = require("../../model/transaction");
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.post("/signin", validators, validateRequest, async (req, res, next) => {
   );
   const balance = user.balance;
   // Respond with the token
-  res.status(200).json({ token, balance });
+  res.status(200).json({ token, balance, transactions: user.transaction });
 });
 
 module.exports = { signinRouter: router };

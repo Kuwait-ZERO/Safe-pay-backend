@@ -9,6 +9,7 @@ const { authRouter } = require("./api/auth");
 const { cardsRouter } = require("./routes");
 const { cardPaymentRouter } = require("./routes/payment.router");
 const { cardDeleteRouter } = require("./routes/cardDelete");
+const { transactionsRouter } = require("./routes/getTransacions");
 const app = express();
 
 /**
@@ -24,6 +25,7 @@ app.use(currentUser);
  */
 app.use("/auth", authRouter);
 app.use("/cards", cardsRouter, cardPaymentRouter, cardDeleteRouter);
+app.use("/transactions", transactionsRouter);
 
 /**
  * Not Found Catchall
