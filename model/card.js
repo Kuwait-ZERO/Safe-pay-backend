@@ -7,7 +7,7 @@ const CardSchema = new Schema({
   cardNumber: { type: Number, unique: true },
   expiryDate: { type: String, required: true, default: "10/28" },
   cvv: { type: Number, unique: true },
-  re: { type: Boolean, default: false },
+  isExpired: { type: Boolean, default: false },
   limit: { type: Number, default: 20 },
 
   user: {
