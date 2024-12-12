@@ -50,7 +50,7 @@ router.post("/pay", async (req, res) => {
 
     // 7. Create a new Transaction
     const newTransaction = await Transaction.create({
-      name: `${paramName} Transaction is a Payment using card ${card.cardNumber}`,
+      name: `${paramName} Transaction is a Payment using card ${card.cardNumber} for ${amount} KWD`,
       amount,
     });
 
